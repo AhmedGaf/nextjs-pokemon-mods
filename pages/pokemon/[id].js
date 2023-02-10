@@ -1,36 +1,30 @@
 /* eslint-disable @next/next/no-img-element */
 import Head from 'next/head'
-import { Inter } from '@next/font/google'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Link from 'next/link'
-import { useRouter } from "next/router";
 import styles from '@/styles/Details.module.css'
 
 
-export default function Details() {
-    const { query: { id }, } = useRouter();
 
-    const [pokemon, setPokemon] = useState(null);
+export async function getServerSideProps({ params }) {
+    const resp = await fetch(
+        `https://jherr-pokemon.s3.us-west-1.amazonaws.com/pokemon/${params.id}.json`
+    );
+
+    return {
+        props: {
+            pokemon: await resp.json(),
+        },
+    };
+
+}
 
 
-    useEffect(() => {
-        async function getPokemon() {
-            const resp = await fetch(`https://jherr-pokemon.s3.us-west-1.amazonaws.com/pokemon/${id}.json`);
+export default function Details({ pokemon }) {
+    return (
+    
+    <div>
 
-            setPokemon(await resp.json());
-        }
-
-        if (id) {
-            getPokemon();
-        }
-
-    }, [id]);
-
-    if (!pokemon) {
-        return null;
-    }
-
-    return <div>
         <Head>
             <title> {pokemon.name} </title>
         </Head>
@@ -72,7 +66,7 @@ export default function Details() {
 
 
         </div>
-    </div>
+    </div>)
 
-        ;
+        
 }
